@@ -1,0 +1,49 @@
+{
+  "evaluation_id": "aiohttp-3.9.1-3.9.2",
+  "date": "2026-09-01",
+  "reviewers": [
+    "Claude security review subagent",
+    "CLIVE"
+  ],
+  "clive_version_tested": "1.0.0",
+  "clive_followup_version": "1.0.1",
+  "candidate_a": {
+    "project": "aio-libs/aiohttp",
+    "tag": "v3.9.1",
+    "commit": "6333c026422c6b0fe57ff63cde4104e2d00f47f4",
+    "ground_truth_role": "vulnerable"
+  },
+  "candidate_b": {
+    "project": "aio-libs/aiohttp",
+    "tag": "v3.9.2",
+    "commit": "24a6d64966d99182e95f5d3a29541ef2fec397ad",
+    "ground_truth_role": "patched"
+  },
+  "primary_ground_truth": {
+    "cve": "CVE-2024-23334",
+    "ghsa": "GHSA-5h86-8mv2-jq9f",
+    "patched_version": "3.9.2"
+  },
+  "reports": {
+    "candidate-a-claude.md": {
+      "path": "reports/candidate-a-claude.md",
+      "original_sha256": "210e2232ea9acc6507f02cadbb0a6d21dc5718c8eedf518ee082ae16c364c7b5",
+      "published_sha256": "2de40595e76e618cfeb812b2fe515de50d5d817101fe4545149c1ca84fe0bfb1"
+    },
+    "candidate-a-clive.md": {
+      "path": "reports/candidate-a-clive.md",
+      "original_sha256": "fa3d72f13352b216242377916e39008d4de39e5a83fbd52c49b5dc5caf8adb9f",
+      "published_sha256": "fa3d72f13352b216242377916e39008d4de39e5a83fbd52c49b5dc5caf8adb9f"
+    },
+    "candidate-b-claude.md": {
+      "path": "reports/candidate-b-claude.md",
+      "original_sha256": "68355031bca281223bcce9e15fd31db61806aad7bfa5e42c5106dd1eb8717a5c",
+      "published_sha256": "c31c10ea21162fffa1a344876ba2a06283e6cff783984deaf637a278f94844e8"
+    },
+    "candidate-b-clive.md": {
+      "path": "reports/candidate-b-clive.md",
+      "original_sha256": "bf158e9ae4d4be632dafc931b36512470755a63ed5cbf45742b9e97255d02ec7",
+      "published_sha256": "bf158e9ae4d4be632dafc931b36512470755a63ed5cbf45742b9e97255d02ec7"
+    }
+  }
+}

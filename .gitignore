@@ -1,0 +1,16 @@
+# Python
+__pycache__/
+*.py[cod]
+
+# OS / editor
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+
+# Local release archives
+*.zip
+
+# Local temporary files
+*.tmp
+*.bak
