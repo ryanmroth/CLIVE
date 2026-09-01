@@ -34,11 +34,9 @@ Finding count is descriptive only. This evaluation prioritizes supported paths, 
 - [`source-manifest.md`](source-manifest.md) — exact upstream tags and commits
 - [`ground-truth.md`](ground-truth.md) — post-freeze advisory comparison
 - [`scorecard.md`](scorecard.md) — qualitative A/B assessment
-- [`SANITIZATION.md`](SANITIZATION.md) — publication privacy treatment
 - [`manifest.json`](manifest.json) — machine-readable evidence manifest
 - [`reports/`](reports/) — publication copies of all four reports
-- [`report-hashes-original.txt`](report-hashes-original.txt) — hashes frozen before ground-truth review
-- [`report-hashes-published.txt`](report-hashes-published.txt) — hashes of publication copies
+- [`report-hashes.txt`](report-hashes.txt) — hashes of publication copies
 
 ## Important qualification
 
