@@ -1,3 +1,5 @@
+![alt text](https://github.com/ryanmroth/CLIVE/blob/main/assets/cover.png?raw=true)
+
 # CLIVE
 
 **Code Logic, Integrity & Vulnerability Evaluator**
