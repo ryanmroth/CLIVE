@@ -4,6 +4,28 @@ All notable changes to CLIVE are documented in this file.
 
 The project follows [Semantic Versioning](https://semver.org/).
 
+## [1.1.0] - 2026-09-03
+
+### Changed
+
+- Made security the explicit governing mission of CLIVE.
+- Reframed Logic, Integrity, Runtime, and Configuration as supporting analytical lenses rather than peer standalone missions.
+- Reordered analysis priorities to: exploitable vulnerabilities; security-control/trust-boundary integrity; security-relevant logic; security-relevant runtime; security-relevant configuration.
+- Added a default security-relevance admission gate for non-Vulnerability findings.
+- Excluded pure correctness, reliability, performance, maintainability, and code-quality defects from default reports unless they have a material security consequence.
+- Tightened Runtime and Configuration reporting to require security-relevant availability, data-integrity, trust, control, or attacker impact.
+- Added an explicit broader-correctness mode that operators may request without weakening security analysis.
+- Added final self-checks requiring CLIVE to state why every non-Vulnerability finding belongs in a security report.
+
+### Unchanged
+
+- CLIVE-native finding domains and optional external taxonomy mappings.
+- Source-only/read-only operating model and static-only guard.
+- Provenance-before-severity and independent severity/confidence.
+- Attack/trigger-path tracing, finding consolidation, and composition analysis.
+- Automatic provisional security-context derivation.
+- Separation of evaluation and remediation.
+
 ## [1.0.1] - 2026-09-01
 
 ### Fixed

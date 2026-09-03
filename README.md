@@ -1,10 +1,8 @@
-![alt text](https://github.com/ryanmroth/CLIVE/blob/main/assets/cover.png?raw=true)
-
 # CLIVE
 
 **Code Logic, Integrity & Vulnerability Evaluator**
 
-CLIVE is a personal, source-only security and correctness evaluator for OpenAI Codex.
+CLIVE is a personal, source-only, **security-first** evaluator for OpenAI Codex.
 
 Install CLIVE once under `~/.codex/` and invoke the same canonical evaluator from any local repository:
 
@@ -12,7 +10,7 @@ Install CLIVE once under `~/.codex/` and invoke the same canonical evaluator fro
 Hey CLIVE, can you look at this code for me?
 ```
 
-CLIVE is designed to behave like an independent senior reviewer rather than a generic vulnerability scanner. It evaluates exploitable vulnerabilities, runtime and logic defects, failures of software/security-control integrity, security regressions, and composed attack paths. It does **not** remediate code or execute the target project.
+CLIVE is designed to behave like an independent senior security reviewer rather than a generic vulnerability scanner or general-purpose correctness analyzer. It prioritizes exploitable vulnerabilities and failures of security controls and trust boundaries, using logic, integrity, runtime, and configuration analysis to discover or substantiate security risk. It does **not** remediate code or execute the target project.
 
 This is a community project and is not an official OpenAI product.
 
@@ -27,10 +25,18 @@ This is a community project and is not an official OpenAI product.
 The name reflects the review scope:
 
 - **Code** — source and configuration are the evidence base.
-- **Logic** — correctness, edge cases, state transitions, failure paths, and transaction behavior.
-- **Integrity** — preservation of intended state, trust boundaries, authorization guarantees, security controls, and operational invariants.
+- **Logic** — security-relevant decision, state-transition, validation, authorization, and transaction behavior.
+- **Integrity** — preservation of intended state, trust boundaries, authorization guarantees, security controls, and security-relevant operational invariants.
 - **Vulnerability** — attacker-exploitable weaknesses and composed attack paths.
-- **Evaluator** — CLIVE weighs provenance, reachability, confidence, severity, and impact rather than merely recognizing suspicious patterns.
+- **Evaluator** — CLIVE weighs provenance, reachability, confidence, severity, and security impact rather than merely recognizing suspicious patterns.
+
+## Security-first doctrine
+
+Security is CLIVE's governing mission.
+
+The native domains — Vulnerability, Logic, Integrity, Runtime, and Configuration — are analytical labels and lenses, not five equal missions. A non-vulnerability defect enters the default report only when CLIVE can establish a material security consequence such as attacker advantage, violation of a security guarantee or trust boundary, failure of a security control, or meaningful security-relevant data-integrity/availability impact.
+
+Pure correctness, reliability, performance, maintainability, or code-quality issues are omitted by default unless the operator explicitly requests a broader correctness review.
 
 ## Why CLIVE exists
 
@@ -227,7 +233,7 @@ Ask CLIVE to audit src/auth/. Do not remediate.
 ### Audit a specific file
 
 ```text
-Have CLIVE perform a source-only security and correctness review of src/api/users.py.
+Have CLIVE perform a source-only security review of src/api/users.py.
 ```
 
 ### Audit a diff
@@ -242,6 +248,19 @@ integrity failures, and vulnerabilities. Do not remediate.
 ```text
 Have CLIVE audit src/auth/ and include per-finding machine-readable JSON.
 Do not remediate.
+```
+
+## Optional broader-correctness mode
+
+CLIVE's default is security-first. If you explicitly request broader correctness, reliability, performance, or code-quality analysis, CLIVE may widen its reporting threshold for that invocation.
+
+Security findings must still be prioritized and clearly separated from broader correctness observations.
+
+Example:
+
+```text
+Have CLIVE perform a security review of this diff, and also report material
+non-security correctness defects in a separate section.
 ```
 
 ## Finding model
@@ -303,7 +322,7 @@ Missing evidence does not automatically increase severity.
 
 ## Evaluation scope
 
-CLIVE evaluates five native finding domains. These domains can overlap:
+CLIVE uses five native finding domains after an issue passes its security-relevance threshold. These domains can overlap:
 
 ### Vulnerability
 
@@ -311,11 +330,11 @@ Examples include injection, broken access control, unsafe deserialization, SSRF,
 
 ### Runtime
 
-Examples include resource leaks, race conditions, unsafe error handling, cancellation failures, integer/boundary defects, transaction failures, and availability-impacting runtime behavior visible from source.
+Examples include races, TOCTOU, error paths, cancellation failures, resource exhaustion, integer/boundary defects, and lifecycle failures when they affect a security control, expose security-sensitive state, or create meaningful attacker-triggerable security availability impact.
 
 ### Logic
 
-Examples include inverted checks, stale or invalid state transitions, missing edge cases, broken rollback behavior, and fail-open logic.
+Examples include inverted authorization/validation checks, security-relevant state transitions, rollback behavior that violates a security invariant, and fail-open logic.
 
 ### Integrity
 
@@ -331,7 +350,7 @@ Integrity is broader than the CIA-triad data-integrity property. In CLIVE, it in
 
 ### Configuration
 
-Configuration findings cover security-relevant deployment, CI/CD, infrastructure, permission, exposure, and hardening defects when they have concrete security or operational impact. Configuration is not a catch-all for generic best practices.
+Configuration findings cover deployment, CI/CD, infrastructure, permission, exposure, and hardening defects only when they create concrete security posture or security-critical operational impact. Configuration is not a catch-all for generic best practices or operational tuning.
 
 ## Attack and trigger paths
 
@@ -527,7 +546,7 @@ Only `clive.toml` and `clive_guard.py` are installed into `~/.codex/`.
 2. **Provenance before severity.**
 3. **Source truth over runtime fiction.**
 4. **Uncertainty changes confidence, not automatically severity.**
-5. **Logic and integrity matter alongside vulnerabilities.**
+5. **Security is the governing mission; logic, integrity, runtime, and configuration are supporting lenses.**
 6. **One evaluator sees the whole finding set.**
 7. **Evaluation and remediation are separate authorities.**
 8. **Project context is helpful, not mandatory.**

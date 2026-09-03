@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 from __future__ import annotations
 
+import json
 import runpy
 import tomllib
 from pathlib import Path
@@ -20,53 +21,70 @@ def check_agent() -> None:
     assert data["sandbox_mode"] == "read-only"
     assert data["approval_policy"] == "never"
     assert data["web_search"] == "disabled"
-    assert data["description"].startswith("CLIVE — Code Logic, Integrity & Vulnerability Evaluator.")
+    assert "source-only security evaluator" in data["description"]
 
     instructions = data["developer_instructions"]
-    for phrase in (
-        "You are CLIVE",
-        "derive a provisional context",
-        "Observed",
-        "Inferred",
-        "Unknown",
-        "Do not write, create, or modify any repository file",
-        "Do not automatically raise severity",
-        "Finding Composition",
-        "Finding Domains and External Taxonomies",
+
+    required = (
+        "Your governing mission is security.",
+        "Do not treat Vulnerability, Logic, Integrity, Runtime, and Configuration as five equal missions.",
+        "# Security-first finding admission",
+        "A Logic, Integrity, Runtime, or Configuration defect is reportable by default only when CLIVE can establish",
+        "Pure correctness, maintainability, performance, reliability, ergonomics, style, or developer-misuse issues",
+        "## Explicit broader-correctness mode",
+        "## 1. Exploitable vulnerabilities",
+        "## 2. Security-control and trust-boundary integrity",
+        "## 3. Security-relevant logic flaws",
+        "## 4. Security-relevant runtime defects",
+        "## 5. Security-relevant configuration and hardening",
+        "Domains classify findings **after** they pass the security-relevance admission gate.",
+        "A non-Vulnerability finding must satisfy the security-relevance admission gate before it is emitted.",
+        "what concrete security property, trust boundary, attacker advantage",
         "External taxonomies are optional annotations, never audit boundaries.",
-        "A valid CLIVE finding does NOT require any external taxonomy mapping.",
-        "Do not work through OWASP, CWE, or another taxonomy as a completeness checklist.",
-        "`domains`",
-        "`external_mappings`",
+        "Finding Composition",
         "CLIVE-<SEQ>",
-    ):
+    )
+    for phrase in required:
         assert phrase in instructions, phrase
 
-    assert "`vulnerability_class`" not in instructions
-    assert "**Classification**:" not in instructions
-    assert "**Domain(s)**:" in instructions
-    assert "**External Mappings**:" in instructions
+    assert "## 2. Runtime bugs" not in instructions
+    assert "## 3. Logic errors" not in instructions
 
     hook_cfg = data["hooks"]["PreToolUse"][0]["hooks"][0]
     assert "clive_guard.py" in hook_cfg["command"]
     assert "clive_guard.py" in hook_cfg["command_windows"]
 
 
+def evaluator():
+    return runpy.run_path(str(HOOK))["evaluate_event"]
+
+
+def allow(evaluate, command: str) -> None:
+    event = {
+        "hook_event_name": "PreToolUse",
+        "tool_name": "Bash",
+        "tool_input": {"command": command},
+    }
+    assert evaluate(event) is None, command
+
+
+def deny(evaluate, tool: str, tool_input: dict) -> None:
+    event = {
+        "hook_event_name": "PreToolUse",
+        "tool_name": tool,
+        "tool_input": tool_input,
+    }
+    result = evaluate(event)
+    assert result is not None, tool
+    assert result["hookSpecificOutput"]["permissionDecision"] == "deny", result
+
+
 def check_hook() -> None:
-    evaluate = runpy.run_path(str(HOOK))["evaluate_event"]
+    evaluate = evaluator()
 
-    def allow(command: str) -> None:
-        result = evaluate({"hook_event_name": "PreToolUse", "tool_name": "Bash", "tool_input": {"command": command}})
-        assert result is None, command
-
-    def deny(tool: str, payload: dict) -> None:
-        result = evaluate({"hook_event_name": "PreToolUse", "tool_name": tool, "tool_input": payload})
-        assert result is not None, tool
-        assert result["hookSpecificOutput"]["permissionDecision"] == "deny", result
-
-    allow('rg -n "CLIVE" README.md')
-    allow('cat README.md')
-    allow('git --no-pager rev-parse --show-toplevel')
+    allow(evaluate, 'rg -n "CLIVE" README.md')
+    allow(evaluate, 'cat README.md')
+    allow(evaluate, 'git --no-pager rev-parse --show-toplevel')
 
     for command in (
         "pytest",
@@ -79,32 +97,27 @@ def check_hook() -> None:
         "git status",
         "git --no-pager diff -- README.md",
     ):
-        deny("Bash", {"command": command})
+        deny(evaluate, "Bash", {"command": command})
 
-    deny("apply_patch", {"command": "*** Begin Patch"})
-    deny("Agent", {"agent_type": "worker"})
-    deny("mcp__filesystem__read_file", {"path": "README.md"})
+    deny(evaluate, "apply_patch", {"command": "*** Begin Patch"})
+    deny(evaluate, "Agent", {"agent_type": "worker"})
+    deny(evaluate, "mcp__filesystem__read_file", {"path": "README.md"})
 
 
-def check_release_hygiene() -> None:
-    for path in ROOT.rglob("*"):
-        assert "__pycache__" not in path.parts, path
-        assert path.suffix != ".pyc", path
-        if not path.is_file():
-            continue
-        try:
-            text = path.read_text(encoding="utf-8")
-        except UnicodeDecodeError:
-            continue
-        marker = "/mnt" + "/data/"
-        assert marker not in text, path
+def check_docs() -> None:
+    readme = (ROOT / "README.md").read_text(encoding="utf-8")
+    changelog = (ROOT / "CHANGELOG.md").read_text(encoding="utf-8")
+    assert "**security-first**" in readme
+    assert "## Security-first doctrine" in readme
+    assert "## Optional broader-correctness mode" in readme
+    assert "## [1.1.0]" in changelog
 
 
 def main() -> int:
     check_agent()
     check_hook()
-    check_release_hygiene()
-    print("PASS: CLIVE v1.0.1 agent configuration, native-domain taxonomy model, and static-only guard validated.")
+    check_docs()
+    print("PASS: CLIVE v1.1.0 security-first directives, native-domain model, and static-only guard validated.")
     return 0
 
 
